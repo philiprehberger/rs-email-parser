@@ -1,0 +1,17 @@
+[package]
+name = "philiprehberger-email-parser"
+version = "0.1.0"
+edition = "2021"
+authors = ["Philip Rehberger"]
+description = "RFC 5322 compliant email address parsing, validation, and normalization"
+license = "MIT"
+repository = "https://github.com/philiprehberger/rs-email-parser"
+keywords = ["email", "validation", "parser", "rfc5322", "address"]
+categories = ["parser-implementations", "web-programming"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"], optional = true }
+
+[features]
+default = []
+serde = ["dep:serde"]
