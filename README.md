@@ -1,12 +1,16 @@
 # rs-email-parser
 
-RFC 5322 compliant email address parsing, validation, and normalization.
+[![CI](https://github.com/philiprehberger/rs-email-parser/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rs-email-parser/actions/workflows/ci.yml)
+[![Crates.io](https://img.shields.io/crates/v/philiprehberger-email-parser.svg)](https://crates.io/crates/philiprehberger-email-parser)
+[![License](https://img.shields.io/github/license/philiprehberger/rs-email-parser)](LICENSE)
+
+RFC 5322 compliant email address parsing, validation, and normalization
 
 ## Installation
 
 ```toml
 [dependencies]
-philiprehberger-email-parser = "0.1"
+philiprehberger-email-parser = "0.1.0"
 ```
 
 ## Usage
@@ -58,6 +62,13 @@ assert!(email.is_role_address());
 | `.normalize()` | Lowercase domain |
 | `.without_plus_alias()` | Remove + alias |
 | `.is_role_address()` | Check if it's a role address |
+
+## Development
+
+```bash
+cargo test
+cargo clippy -- -D warnings
+```
 
 ## License
 
