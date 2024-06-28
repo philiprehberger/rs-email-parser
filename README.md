@@ -10,7 +10,7 @@ RFC 5322 compliant email address parsing, validation, and normalization
 
 ```toml
 [dependencies]
-philiprehberger-email-parser = "0.1.0"
+philiprehberger-email-parser = "0.1.1"
 ```
 
 ## Usage
