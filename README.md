@@ -10,7 +10,7 @@ RFC 5322 compliant email address parsing, validation, and normalization
 
 ```toml
 [dependencies]
-philiprehberger-email-parser = "0.1.2"
+philiprehberger-email-parser = "0.2.0"
 ```
 
 ## Usage
@@ -50,6 +50,16 @@ let email = Email::parse("admin@example.com")?;
 assert!(email.is_role_address());
 ```
 
+### Free provider detection
+
+```rust
+let email = Email::parse("user@gmail.com")?;
+assert!(email.is_free_provider());
+
+let email = Email::parse("user@company.com")?;
+assert!(!email.is_free_provider());
+```
+
 ## API
 
 | Function / Type | Description |
@@ -62,6 +72,7 @@ assert!(email.is_role_address());
 | `.normalize()` | Lowercase domain |
 | `.without_plus_alias()` | Remove + alias |
 | `.is_role_address()` | Check if it's a role address |
+| `.is_free_provider()` | Check if domain is a free email provider |
 
 ## Development
 
