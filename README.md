@@ -3,6 +3,7 @@
 [![CI](https://github.com/philiprehberger/rs-email-parser/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rs-email-parser/actions/workflows/ci.yml)
 [![Crates.io](https://img.shields.io/crates/v/philiprehberger-email-parser.svg)](https://crates.io/crates/philiprehberger-email-parser)
 [![License](https://img.shields.io/github/license/philiprehberger/rs-email-parser)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ec6cb9)](https://github.com/sponsors/philiprehberger)
 
 RFC 5322 compliant email address parsing, validation, and normalization
 
