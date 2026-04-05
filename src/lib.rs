@@ -21,6 +21,19 @@
 use std::fmt;
 use std::str::FromStr;
 
+/// Known free email provider domains.
+const FREE_PROVIDERS: &[&str] = &[
+    "gmail.com",
+    "yahoo.com",
+    "hotmail.com",
+    "outlook.com",
+    "aol.com",
+    "protonmail.com",
+    "icloud.com",
+    "mail.com",
+    "zoho.com",
+];
+
 /// Known role address local parts.
 const ROLE_ADDRESSES: &[&str] = &[
     "admin",
@@ -242,6 +255,16 @@ impl Email {
     pub fn is_role_address(&self) -> bool {
         let lower = self.local_part.to_lowercase();
         ROLE_ADDRESSES.contains(&lower.as_str())
+    }
+
+    /// Returns `true` if the domain belongs to a known free email provider.
+    ///
+    /// Recognized providers: gmail.com, yahoo.com, hotmail.com, outlook.com,
+    /// aol.com, protonmail.com, icloud.com, mail.com, zoho.com.
+    ///
+    /// The check is case-insensitive.
+    pub fn is_free_provider(&self) -> bool {
+        FREE_PROVIDERS.contains(&self.domain.to_lowercase().as_str())
     }
 }
 
@@ -754,5 +777,53 @@ mod tests {
         let email = Email::parse("<user@example.com>").unwrap();
         assert_eq!(email.local_part(), "user");
         assert_eq!(email.display_name(), None);
+    }
+
+    #[test]
+    fn test_is_free_provider_true() {
+        let email = Email::parse("user@gmail.com").unwrap();
+        assert!(email.is_free_provider());
+
+        let email = Email::parse("user@yahoo.com").unwrap();
+        assert!(email.is_free_provider());
+
+        let email = Email::parse("user@hotmail.com").unwrap();
+        assert!(email.is_free_provider());
+
+        let email = Email::parse("user@outlook.com").unwrap();
+        assert!(email.is_free_provider());
+
+        let email = Email::parse("user@protonmail.com").unwrap();
+        assert!(email.is_free_provider());
+
+        let email = Email::parse("user@icloud.com").unwrap();
+        assert!(email.is_free_provider());
+
+        let email = Email::parse("user@aol.com").unwrap();
+        assert!(email.is_free_provider());
+
+        let email = Email::parse("user@mail.com").unwrap();
+        assert!(email.is_free_provider());
+
+        let email = Email::parse("user@zoho.com").unwrap();
+        assert!(email.is_free_provider());
+    }
+
+    #[test]
+    fn test_is_free_provider_false() {
+        let email = Email::parse("user@example.com").unwrap();
+        assert!(!email.is_free_provider());
+
+        let email = Email::parse("user@company.org").unwrap();
+        assert!(!email.is_free_provider());
+    }
+
+    #[test]
+    fn test_is_free_provider_case_insensitive() {
+        let email = Email::parse("user@Gmail.COM").unwrap();
+        assert!(email.is_free_provider());
+
+        let email = Email::parse("user@YAHOO.COM").unwrap();
+        assert!(email.is_free_provider());
     }
 }

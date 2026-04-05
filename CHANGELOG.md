@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.0] - 2026-04-05
+
+- Add `is_free_provider()` method to check if domain belongs to a known free email provider
+- Recognized providers: gmail.com, yahoo.com, hotmail.com, outlook.com, aol.com, protonmail.com, icloud.com, mail.com, zoho.com
+
 ## 0.1.3 (2026-03-31)
 
 - Standardize README to 3-badge format with emoji Support section
