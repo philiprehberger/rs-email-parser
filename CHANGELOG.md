@@ -1,6 +1,13 @@
 # Changelog
 
-## [0.2.0] - 2026-04-05
+## 0.3.0 (2026-04-28)
+
+- Add `is_disposable_provider()` method recognizing 12 throwaway email providers
+- Add `is_corporate()` convenience returning `!is_free_provider() && !is_disposable_provider()`
+- Add `to_canonical()` combining `normalize()` and `without_plus_alias()` for dedup keys
+- Add `tld()` returning the last domain label (or `None` for IP literals)
+
+## 0.2.0 (2026-04-05)
 
 - Add `is_free_provider()` method to check if domain belongs to a known free email provider
 - Recognized providers: gmail.com, yahoo.com, hotmail.com, outlook.com, aol.com, protonmail.com, icloud.com, mail.com, zoho.com

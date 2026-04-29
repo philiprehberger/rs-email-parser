@@ -10,7 +10,7 @@ RFC 5322 compliant email address parsing, validation, and normalization
 
 ```toml
 [dependencies]
-philiprehberger-email-parser = "0.2.0"
+philiprehberger-email-parser = "0.3.0"
 ```
 
 ## Usage
@@ -60,6 +60,39 @@ let email = Email::parse("user@company.com")?;
 assert!(!email.is_free_provider());
 ```
 
+### Disposable provider detection
+
+```rust
+let email = Email::parse("user@mailinator.com")?;
+assert!(email.is_disposable_provider());
+```
+
+### Corporate detection
+
+```rust
+let email = Email::parse("user@company.com")?;
+assert!(email.is_corporate());
+
+let email = Email::parse("user@gmail.com")?;
+assert!(!email.is_corporate());
+```
+
+### Canonicalization
+
+```rust
+let email = Email::parse("User+tag@Example.COM")?;
+let canonical = email.to_canonical();
+assert_eq!(canonical.local_part(), "User");
+assert_eq!(canonical.domain(), "example.com");
+```
+
+### Top-level domain
+
+```rust
+let email = Email::parse("user@example.com")?;
+assert_eq!(email.tld(), Some("com"));
+```
+
 ## API
 
 | Function / Type | Description |
@@ -73,6 +106,10 @@ assert!(!email.is_free_provider());
 | `.without_plus_alias()` | Remove + alias |
 | `.is_role_address()` | Check if it's a role address |
 | `.is_free_provider()` | Check if domain is a free email provider |
+| `.is_disposable_provider()` | Check if domain is a disposable / throwaway provider |
+| `.is_corporate()` | True if neither free nor disposable |
+| `.to_canonical()` | Combine `normalize()` + `without_plus_alias()` |
+| `.tld()` | Last domain label, or `None` for IP literals |
 
 ## Development
 

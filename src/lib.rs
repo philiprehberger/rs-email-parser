@@ -34,6 +34,22 @@ const FREE_PROVIDERS: &[&str] = &[
     "zoho.com",
 ];
 
+/// Known disposable / throwaway email provider domains.
+const DISPOSABLE_PROVIDERS: &[&str] = &[
+    "mailinator.com",
+    "tempmail.com",
+    "10minutemail.com",
+    "guerrillamail.com",
+    "yopmail.com",
+    "getnada.com",
+    "throwawaymail.com",
+    "dispostable.com",
+    "fakeinbox.com",
+    "sharklasers.com",
+    "trashmail.com",
+    "maildrop.cc",
+];
+
 /// Known role address local parts.
 const ROLE_ADDRESSES: &[&str] = &[
     "admin",
@@ -265,6 +281,47 @@ impl Email {
     /// The check is case-insensitive.
     pub fn is_free_provider(&self) -> bool {
         FREE_PROVIDERS.contains(&self.domain.to_lowercase().as_str())
+    }
+
+    /// Returns `true` if the domain belongs to a known disposable / throwaway
+    /// email provider.
+    ///
+    /// Recognized providers include: mailinator.com, tempmail.com,
+    /// 10minutemail.com, guerrillamail.com, yopmail.com, getnada.com,
+    /// throwawaymail.com, dispostable.com, fakeinbox.com, sharklasers.com,
+    /// trashmail.com, maildrop.cc.
+    ///
+    /// The check is case-insensitive.
+    pub fn is_disposable_provider(&self) -> bool {
+        DISPOSABLE_PROVIDERS.contains(&self.domain.to_lowercase().as_str())
+    }
+
+    /// Returns `true` if the domain is neither a free nor a disposable provider.
+    ///
+    /// Useful when filtering out personal addresses to focus on business / work
+    /// emails. Note: this is a heuristic; a non-listed domain could still be a
+    /// personal vanity address.
+    pub fn is_corporate(&self) -> bool {
+        !self.is_free_provider() && !self.is_disposable_provider()
+    }
+
+    /// Returns a canonicalized [`Email`] suitable for deduplication keys:
+    /// domain lowercased and `+` alias removed from the local part.
+    ///
+    /// Equivalent to calling [`Self::normalize`] followed by
+    /// [`Self::without_plus_alias`].
+    pub fn to_canonical(&self) -> Email {
+        self.normalize().without_plus_alias()
+    }
+
+    /// Returns the top-level domain label (the last segment of the domain).
+    ///
+    /// Returns `None` if the domain is an IP literal (e.g. `[192.168.1.1]`).
+    pub fn tld(&self) -> Option<&str> {
+        if self.domain.starts_with('[') {
+            return None;
+        }
+        self.domain.rsplit('.').next()
     }
 }
 
@@ -825,5 +882,84 @@ mod tests {
 
         let email = Email::parse("user@YAHOO.COM").unwrap();
         assert!(email.is_free_provider());
+    }
+
+    #[test]
+    fn test_is_disposable_provider_true() {
+        let email = Email::parse("user@mailinator.com").unwrap();
+        assert!(email.is_disposable_provider());
+
+        let email = Email::parse("user@10minutemail.com").unwrap();
+        assert!(email.is_disposable_provider());
+
+        let email = Email::parse("user@guerrillamail.com").unwrap();
+        assert!(email.is_disposable_provider());
+    }
+
+    #[test]
+    fn test_is_disposable_provider_false() {
+        let email = Email::parse("user@gmail.com").unwrap();
+        assert!(!email.is_disposable_provider());
+
+        let email = Email::parse("user@example.com").unwrap();
+        assert!(!email.is_disposable_provider());
+    }
+
+    #[test]
+    fn test_is_disposable_provider_case_insensitive() {
+        let email = Email::parse("user@MAILINATOR.COM").unwrap();
+        assert!(email.is_disposable_provider());
+    }
+
+    #[test]
+    fn test_is_corporate_true() {
+        let email = Email::parse("user@example.com").unwrap();
+        assert!(email.is_corporate());
+
+        let email = Email::parse("user@company.org").unwrap();
+        assert!(email.is_corporate());
+    }
+
+    #[test]
+    fn test_is_corporate_false_for_free() {
+        let email = Email::parse("user@gmail.com").unwrap();
+        assert!(!email.is_corporate());
+    }
+
+    #[test]
+    fn test_is_corporate_false_for_disposable() {
+        let email = Email::parse("user@mailinator.com").unwrap();
+        assert!(!email.is_corporate());
+    }
+
+    #[test]
+    fn test_to_canonical() {
+        let email = Email::parse("User+tag@Example.COM").unwrap();
+        let canonical = email.to_canonical();
+        assert_eq!(canonical.local_part(), "User");
+        assert_eq!(canonical.domain(), "example.com");
+    }
+
+    #[test]
+    fn test_to_canonical_no_plus() {
+        let email = Email::parse("user@Example.COM").unwrap();
+        let canonical = email.to_canonical();
+        assert_eq!(canonical.local_part(), "user");
+        assert_eq!(canonical.domain(), "example.com");
+    }
+
+    #[test]
+    fn test_tld() {
+        let email = Email::parse("user@example.com").unwrap();
+        assert_eq!(email.tld(), Some("com"));
+
+        let email = Email::parse("user@sub.example.co.uk").unwrap();
+        assert_eq!(email.tld(), Some("uk"));
+    }
+
+    #[test]
+    fn test_tld_ip_literal() {
+        let email = Email::parse("user@[192.168.1.1]").unwrap();
+        assert_eq!(email.tld(), None);
     }
 }
